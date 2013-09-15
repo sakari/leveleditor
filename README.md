@@ -41,3 +41,7 @@ For the selection of make targets run
 (c) Sakari Jokinen
 
 MIT license
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/sakari/leveleditor/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
