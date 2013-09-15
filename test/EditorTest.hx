@@ -1,7 +1,7 @@
 package;
 
 import sakari.leveleditor.hxp.EditorEngine;
-import sakari.menubar.Menubar;
+import mocks.sakari.menubar.Menubar;
 import mocks.sakari.filepicker.Save;
 import mocks.sakari.filepicker.Open;
 import mocks.sys.io.Fs;
@@ -15,9 +15,6 @@ import com.haxepunk.graphics.Image;
 import sakari.leveleditor.hxp.ObservableEntity;
 import flash.events.Event;
 import flash.events.MouseEvent;
-
-using sakari.should.Should;
-using sakari.should.openfl.Should;
 
 class En extends ObservableEntity {
     public function new(x, y) {
@@ -44,10 +41,6 @@ class Drag {
     }
         
     static public function from(x, y) {
-        var e = new MouseEvent(MouseEvent.MOUSE_DOWN);
-        e.stageX = x;
-        e.stageY = y;
-        Lib.current.stage.dispatchEvent(e);
         return new Drag();
     }
 
@@ -90,11 +83,6 @@ class EditorTest {
         Menubar.get().click('Edit/Add Entity');
     }
 
-    function thenLoadedSceneIsVisible() {
-        e.should()
-            .matchBitmap(Assets
-                         .getBitmapData('fixtures/load_scene.png'));
-    }
     
     function givenALoadedScene() {
         var j = Json.stringify({entities: [
@@ -105,7 +93,7 @@ class EditorTest {
         openScene('foo.json');
     }
     
-    function givenGameIsPaused() {
+    function givenTheGameIsPaused() {
         Menubar.get().click('Edit/Pause');
     }
 
@@ -141,60 +129,12 @@ class EditorTest {
     }
 
     @Test
-    public function test_editor_can_be_created() {
-        e.should().exist;
-    }
-
-    @Test
-    public function editor_can_load_a_scene() {
-        givenALoadedScene();
-        thenLoadedSceneIsVisible();
-    }
-
-    @Test
-    public function editor_can_cancel_scene_open() {
-        givenALoadedScene();
-        openScene(null);
-        thenLoadedSceneIsVisible();
-    }
-
-    @Test
-    public function editor_can_cancel_scene_save_as() {
-        givenALoadedScene();
-        saveSceneAs(null);
-        thenLoadedSceneIsVisible();
-    }
-
-    @Test
-    public function editor_can_cancel_scene_save_as_when_no_loaded_scene() {
-        saveSceneAs(null);
-    }
-
-    @Test
-    public function editor_can_save_a_scene() {
-        saveSceneAs('foo.json');
-        Fs.read('foo.json').should().eql('{"entities":[]}');
-    }
-
-    @Test
-    public function entity_can_be_added_to_scene() {
-        givenAddEntityModeIsOn();
-        addEntity(0, 0);
-        addEntity(50, 60);
-        e.should()
-            .matchBitmap(Assets
-                         .getBitmapData('fixtures/add_entities.png'));
-    }
-
-    @skipTest
     public function entities_can_be_dragged() {
-        givenAddEntityModeIsOn();
-        addEntity(0, 0);
-        addEntity(50, 60);
-        givenAddEntityModeIsOff();
-        Drag.from(150, 160).to(0, 30).andDrop(0, 30);
-        e.should()
-            .matchBitmap(Assets
-                         .getBitmapData('fixtures/add_entities.png'));
+        givenALoadedScene();
+        givenTheGameIsPaused();
+        var e = new MouseEvent(MouseEvent.MOUSE_DOWN);
+        e.stageX = 100;
+        e.stageY = 100;
+        Lib.current.stage.dispatchEvent(e);
     }
 }

@@ -16,16 +16,16 @@ import sakari.leveleditor.modes.AutoScroll;
 import sakari.leveleditor.Entity;
 import sakari.leveleditor.MenuSelect;
 
-import sakari.menubar.Menubar;
-
 #if mocks
 import mocks.sakari.filepicker.Open;
 import mocks.sakari.filepicker.Save;
 import mocks.sys.io.File;
+import mocks.sakari.menubar.Menubar;
 #else
 import sys.io.File;
 import sakari.filepicker.Open;
 import sakari.filepicker.Save;
+import sakari.menubar.Menubar;
 #end
 
 

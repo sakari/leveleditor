@@ -1,5 +1,10 @@
 package sakari.leveleditor;
+
+#if mocks
+import mocks.sakari.menubar.Menubar;
+#else
 import sakari.menubar.Menubar;
+#end
 
 class MenuSelect<T> {
     var m: Menubar;
