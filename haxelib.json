@@ -1,0 +1,14 @@
+{
+    "name": "level-editor",
+    "url": "",
+    "license": "propriatory",
+    "tags": ["openfl", "game", "editor", "level", "scene"],
+    "description": "Somewhat game engine agnostic level editor for haxe/openfl",
+    "version": "1.0.0-alpha",
+    "releasenote": "",
+    "contributors": [""],
+    "dependencies": {
+        "openfl": "1.0.5",
+        "menubar": "*"
+    }
+}

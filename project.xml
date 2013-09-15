@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+	<meta title="Tests" package="tests" version="1.0.0" company="example" />
+
+	<window fps="60" background="0x333333" />
+	<window width="640" height="480" resizable="true" unless="mobile" />
+	<window fullscreen="true" if="mobile" />
+	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
+
+    <haxeflag name="-D debug" if="debug"/>
+
+	<haxelib name="openfl" />
+    <haxelib name="menubar" />
+	<haxelib name="haxepunk" />
+
+    <section if="runDoc" >
+	  <app file="Validation" main="EditorTest" path="buildDoc" />
+      <source path="example/src" />
+      <haxelib name="filepicker" />
+    </section>
+
+    <section if="runTest">
+	  <app file="Validation" main="TestMain" path="buildTest" if="runTest"/>
+	  <source path="test" />
+      <haxeflag name="-D mocks" />
+	  <haxelib name="should" />
+	  <haxelib name="should-openfl" />
+	  <haxelib name="munit" />
+    </section>
+
+	<assets path="test/fixtures" rename="fixtures" include="*.png|*.jpg" />
+</project>

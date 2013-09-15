@@ -1,0 +1,11 @@
+*~
+buildDoc/
+build/
+buildTest/
+Export/
+bin/
+test/TestMain.hx
+test/ExampleTest.hx
+test/TestSuite.hx
+doc/index.html
+doc/content/
