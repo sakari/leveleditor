@@ -42,15 +42,16 @@ enum Id {
 
 class Observable<T> {
     var t: T;
-    var listeners: Array<T -> Void>;
+    var listeners: Array<T -> T -> Void>;
     public function new(t: T) {
         listeners = [];
         this.t = t;
     }
 
     public function set(t: T): Observable<T> {
+        var old = this.t;
         this.t = t;
-        notify();
+        notify(old);
         return this;
     }
 
@@ -58,14 +59,14 @@ class Observable<T> {
         return this.t;
     }
 
-    public function listen(f:T -> Void): Observable<T> {
+    public function listen(f:T -> T -> Void): Observable<T> {
         listeners.push(f);
         return this;
     }
 
-    function notify() {
+    function notify(T) {
         for(i in listeners) {
-            i(this.t);
+            i(this.t, T);
         }
     }
 }
@@ -124,36 +125,17 @@ class Editor {
         entityAdd.enable();
     }
 
-    private function editorToggle() {
-        if(!paused.get()) {
-            originalCamera = camera.get();
-            select.enable();
-        } else {
-            camera.set(originalCamera);
-            originalCamera = null;
-            majorMode.disable();
-        }
-        paused.set(!paused.get());
-    }
-
-    private function setupShortcutKeys() {
-        keys = [
-                115 => selectMode
-                , 97 => addEntityMode
-                , 9 => editorToggle
-                ];
-    }
-
     public function loadScene(scene: SceneBridge) {
         scene.onAddEntity.call(addEntity);
         scene.onBegin.call( function(sprite: Sprite) {
                 editorLayer = new Sprite();
-                camera.listen(function(p) {
+                camera.listen(function(p, o) {
                         editorLayer.x = -p.x;
                         editorLayer.y = -p.y;
                     });
                 sprite.addChild(editorLayer);
             });
+        paused.set(true);
         scene.load();
     }
 
@@ -176,7 +158,17 @@ class Editor {
         this.prefabs = prefabs;
         this.camera = camera;
         
-        setupShortcutKeys();
+        paused.listen(function(v, old) {
+                if(v == old) return;
+                if(v) {
+                    originalCamera = camera.get();
+                    select.enable();
+                }else {
+                    camera.set(originalCamera);
+                    originalCamera = null;
+                    majorMode.disable();
+                }
+            });
         entityAdd = new AddEntity(Lib.current.stage
                                   , camera
                                   , function(x: Float, y: Float) {
@@ -194,12 +186,6 @@ class Editor {
             .add(entityAdd)
             .add(select);
         setupMenubar();
-        Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, function(d: Dynamic) {
-                trace('charCode', d.charCode);
-                if(keys.exists(d.charCode)) {
-                    keys.get(d.charCode)();
-                }
-            });
         newScene();
     }
 
@@ -269,7 +255,7 @@ class Editor {
             .enable('Edit/Pause')
             .add('Edit/Add Entity')
             .listen('Edit/Pause', function() {
-                    editorToggle();
+                    paused.set(!paused.get());
                 })
             .listen('Edit/Add Entity', function() {
                     if(entityAdd.enabled) {
@@ -289,7 +275,7 @@ class Editor {
                     m.off('Edit/Add Entity');
                 });
 
-        this.paused.listen(function(v) {
+        this.paused.listen(function(v, o) {
                 if(v) {
                     m.on('Edit/Pause');
                     m.enable('Edit/Add Entity');

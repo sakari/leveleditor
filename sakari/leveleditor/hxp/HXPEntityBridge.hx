@@ -19,17 +19,17 @@ class HXPEntityBridge implements EntityBridge{
                 this.x.set(e.x + e.originX);
                 this.y.set(e.y + e.originY);
             });
-        this.x.listen(function(x) {
+        this.x.listen(function(x, o) {
                 if(x == this.e.x + e.originX) return;
                 this.e.x = x - e.originX;
                 HXP.engine.render();
             });
-        this.y.listen(function(y) {
+        this.y.listen(function(y, o) {
                 if(y == this.e.y + e.originY) return;
                 this.e.y = y - e.originY;
                 HXP.engine.render();
             });
-        this.deleted.listen(function(v) {
+        this.deleted.listen(function(v, o) {
                 if(!v) return;
                 e.scene.remove(e);
                 HXP.engine.update();

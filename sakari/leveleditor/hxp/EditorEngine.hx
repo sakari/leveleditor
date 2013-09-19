@@ -45,7 +45,7 @@ class EditorEngine extends Engine {
     override public function init() {
         super.init();
         observableCamera = new Observable(HXP.scene.camera)
-            .listen(function(p) {
+            .listen(function(p, o) {
                     HXP.scene.camera = p;
                     HXP.engine.render();
                 });
@@ -58,7 +58,7 @@ class EditorEngine extends Engine {
                             , screen
                             , observableCamera
                             , new Observable(HXP.engine.paused)
-                            .listen(function(p) {
+                            .listen(function(p, o) {
                                     HXP.engine.paused = p;
                                 }) 
                             , entities());

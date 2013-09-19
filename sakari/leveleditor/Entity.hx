@@ -40,13 +40,13 @@ class Entity extends Sprite {
         draw();
         x = e.x.get();
         y = e.y.get();
-        e.x.listen(function(x) {
+        e.x.listen(function(x, o) {
                 this.x = x;
             });
-        e.y.listen(function(y) {
+        e.y.listen(function(y, o) {
                 this.y = y;
             });
-        e.deleted.listen(function(v) {
+        e.deleted.listen(function(v, o) {
                 if(v) delete();
             });
     }

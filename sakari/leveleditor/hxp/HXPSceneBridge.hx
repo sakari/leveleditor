@@ -34,6 +34,8 @@ class HXPSceneBridge extends Scene implements SceneBridge {
 
     public function load() {
         HXP.scene = this;
+        HXP.engine.update();
+        HXP.engine.render();
     }
 
     public override function update() {
