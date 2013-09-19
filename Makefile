@@ -4,14 +4,13 @@ example:
 	cd example && openfl test mac -debug -Ddebug
 test:
 	haxelib run munit gen
-	openfl test cpp -DrunTest
+	openfl test cpp -DrunTest -debug -Ddebug
 
 doc:
 	openfl build cpp -xml -DrunDoc
 	cd doc && haxedoc ../buildDoc/mac/cpp/types.xml
 clean:
-	rm -rf buildTest
-	rm -rf buildDoc
+	rm -rf build
 	rm -rf example/Export
 	-rm doc/index.html
 	rm -rf doc/content

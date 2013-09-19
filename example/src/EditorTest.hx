@@ -14,9 +14,9 @@ class EditorTest extends EditorEngine {
     public override function entityFactory(p) {
         var e: ObservableEntity;
         if(p.type == 'some')
-            e = new SomeEntity(p.x, p.y);
+            e = new SomeEntity(p);
         else
-            e = new OtherEntity(p.x, p.y);
+            e = new OtherEntity(p);
         return e;
     }
 

@@ -1,7 +1,5 @@
 *~
-buildDoc/
 build/
-buildTest/
 Export/
 bin/
 test/TestMain.hx

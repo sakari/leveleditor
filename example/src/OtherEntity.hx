@@ -6,12 +6,10 @@ import sakari.leveleditor.hxp.ObservableEntity;
 class OtherEntity extends ObservableEntity {
     var speed: Point;
 
-    public function new(x, y) {
-        super();
+    public function new(def) {
+        super(def);
         speed = new Point(0, 5 - Math.random() * 10);
         var i = new Image('graphics/test.png');
-        this.x = x;
-        this.y = y;
         addGraphic(i);
         setOrigin(Std.int(i.width / 2), Std.int(i.height / 2));
     }

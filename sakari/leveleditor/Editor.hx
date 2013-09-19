@@ -40,36 +40,6 @@ enum Id {
     IdDynamic(id: Int);
 }
 
-class Observable<T> {
-    var t: T;
-    var listeners: Array<T -> T -> Void>;
-    public function new(t: T) {
-        listeners = [];
-        this.t = t;
-    }
-
-    public function set(t: T): Observable<T> {
-        var old = this.t;
-        this.t = t;
-        notify(old);
-        return this;
-    }
-
-    public function get(): T {
-        return this.t;
-    }
-
-    public function listen(f:T -> T -> Void): Observable<T> {
-        listeners.push(f);
-        return this;
-    }
-
-    function notify(T) {
-        for(i in listeners) {
-            i(this.t, T);
-        }
-    }
-}
 
 interface SceneBridge {
     var onAddEntity: EventEmitter<EntityBridge>;
@@ -81,6 +51,7 @@ interface EntityBridge {
     var x: Observable<Float>;
     var y: Observable<Float>;
     var deleted: Observable<Bool>;
+    var definition: EntityArguments;
 }
 
 typedef Prefab = {
@@ -96,6 +67,9 @@ typedef EntityArguments = {
     var x: Float;
     var y: Float;
     var type: String;
+    var id: Int;
+    var save: Bool;
+    var deleted: Bool;
 }
 
 class Editor {
@@ -114,16 +88,7 @@ class Editor {
     var sceneDefinition: JsonScene;
     var prefabSelect: MenuSelect<Prefab>;
     var currentSceneFile: String;
-
-    private function selectMode() {
-        if(!paused.get()) return;
-        select.enable();
-    }
-
-    private function addEntityMode() {
-        if(!paused.get()) return;
-        entityAdd.enable();
-    }
+    var sceneEntities: Array<Entity>;
 
     public function loadScene(scene: SceneBridge) {
         scene.onAddEntity.call(addEntity);
@@ -153,6 +118,7 @@ class Editor {
                          , paused
                          , prefabs
                          ) {
+        sceneEntities = [];
         this.createScene = createScene;
         this.paused = paused;
         this.prefabs = prefabs;
@@ -177,8 +143,10 @@ class Editor {
                                           type: selectedPrefab.type
                                           , x: x + camera.get().x
                                           , y: y + camera.get().y
+                                          , id: 0
+                                          , save: true
+                                          , deleted: false
                                       };
-                                      sceneDefinition.entities.push(e);
                                       createEntity(e);
                                   });
         select = new Select(Lib.current.stage, camera, screen);
@@ -200,6 +168,14 @@ class Editor {
         function saveCurrentFile() {
             if(currentSceneFile == null) return;
             var file = File.write(currentSceneFile, false);
+            sceneDefinition.entities = [];
+            for(e in sceneEntities) {
+                if(!e.saved.save || e.saved.deleted) continue;
+                sceneDefinition.entities.push(e.saved);
+            }
+            sceneEntities = sceneEntities.filter(function(e) {
+                    return !e.saved.deleted;
+                });
             file.writeString(Json.stringify(sceneDefinition));
         }
 
@@ -288,7 +264,9 @@ class Editor {
     }
 
     public function addEntity(e: EntityBridge): Editor {
-        editorLayer.addChild(new Entity(e));
+        var entity = new Entity(e);
+        sceneEntities.push(entity);
+        editorLayer.addChild(entity);
         return this;
     }
 }

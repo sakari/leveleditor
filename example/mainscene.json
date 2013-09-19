@@ -1,7 +1,7 @@
 {
     "entities": [
-        {"x": 10, "y": 10},
-        {"x": 20, "y": 20},
-        {"x": 20, "y": 30}
+        {"x": 10, "y": 10, "save": true, "type": "some"},
+        {"x": 20, "y": 20, "save": true, "type": "some"},
+        {"x": 20, "y": 30, "save": true, "type": "other"}
     ]
 }

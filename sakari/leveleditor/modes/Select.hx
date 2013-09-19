@@ -74,6 +74,7 @@ class Select extends Mode {
         selected.map(function(e) {
                 e.bridge.x.set(e.bridge.x.get() + x - dragStart.x);
                 e.bridge.y.set(e.bridge.y.get() + y - dragStart.y);
+                e.save();
             });
         dragStart.x = x;
         dragStart.y = y;
@@ -83,6 +84,7 @@ class Select extends Mode {
         if(k.charCode != BACKSPACE) return;
         selected.map(function(e) {
                 e.delete();
+                e.save();
             });
         selected = [];
     }

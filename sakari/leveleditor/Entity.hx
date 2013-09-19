@@ -7,6 +7,18 @@ class Entity extends Sprite {
     public var bridge: EntityBridge;
     public var selected(get, set): Bool;
     var _selected: Bool;
+    var _saved: EntityArguments;
+    public var saved(get, null): EntityArguments;
+
+    public function get_saved() {
+        return _saved;
+    }
+
+    public function save() {
+        _saved.x = bridge.x.get();
+        _saved.y = bridge.y.get();
+        _saved.deleted = bridge.deleted.get();
+    }
 
     public function get_selected(): Bool {
         return _selected;
@@ -34,6 +46,7 @@ class Entity extends Sprite {
     }
 
     public function new(e: EntityBridge) {
+        _saved = e.definition;
         super();
         selected = false;
         this.bridge = e;

@@ -15,19 +15,17 @@
 	<haxelib name="haxepunk" />
 
     <section if="runDoc" >
-	  <app file="Validation" main="EditorTest" path="buildDoc" />
+	  <app file="Validation" main="EditorTest" path="build/doc" />
       <source path="example/src" />
       <haxelib name="filepicker" />
     </section>
 
     <section if="runTest">
-	  <app file="Validation" main="TestMain" path="buildTest" if="runTest"/>
+	  <app file="Validation" main="TestMain" path="build/test" if="runTest"/>
 	  <source path="test" />
       <haxeflag name="-D mocks" />
 	  <haxelib name="should" />
 	  <haxelib name="should-openfl" />
 	  <haxelib name="munit" />
     </section>
-
-	<assets path="test/fixtures" rename="fixtures" include="*.png|*.jpg" />
 </project>

@@ -8,8 +8,10 @@ class HXPEntityBridge implements EntityBridge{
     public var x: Observable<Float>;
     public var y: Observable<Float>;
     public var deleted: Observable<Bool>;
+    public var definition: EntityArguments;
 
     public function new(e: ObservableEntity) {
+        definition = e.def;
         this.e = e;
         this.x = new Observable(e.x + e.originX);
         this.y = new Observable(e.y + e.originY);
