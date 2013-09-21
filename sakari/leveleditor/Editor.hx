@@ -7,7 +7,6 @@ import flash.events.MouseEvent;
 import flash.Lib;
 import flash.geom.Point;
 
-import haxe.Json;
 import sakari.leveleditor.modes.Single;
 import sakari.leveleditor.modes.AddEntity;
 import sakari.leveleditor.modes.Camera;
@@ -176,7 +175,7 @@ class Editor {
             sceneEntities = sceneEntities.filter(function(e) {
                     return !e.saved.deleted;
                 });
-            file.writeString(Json.stringify(sceneDefinition));
+            file.writeString(new Json().stringify(sceneDefinition));
         }
 
         function saveAs() {
@@ -196,7 +195,7 @@ class Editor {
                             var path = paths[0];
                             var contents = File.getContent(path);
                             try {
-                                sceneDefinition = Json.parse(contents);
+                                sceneDefinition = new Json().parse(contents);
                             } catch(e: Dynamic) {
                                 trace('parse error for $path: $e');
                                 return;
