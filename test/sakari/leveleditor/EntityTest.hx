@@ -4,20 +4,6 @@ import sakari.leveleditor.Editor;
 import flash.display.Sprite;
 using sakari.should.Should;
 
-class TestEntityBridge implements EntityBridge {
-    public var x: Observable<Float>;
-    public var y: Observable<Float>;
-    public var deleted: Observable<Bool>;
-    public var definition: EntityArguments;
-
-    public function new(e: EntityArguments) {
-        x = new Observable(e.x);
-        y = new Observable(e.y);
-        deleted = new Observable(false);
-        definition = e;
-    }
-}
-
 class EntityTest {
     var b: EntityBridge;
     var e: Entity;

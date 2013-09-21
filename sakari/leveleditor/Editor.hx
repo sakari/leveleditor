@@ -83,25 +83,8 @@ class Editor {
     var entityAdd: Mode;
     var select: Mode;
     var originalCamera: Point;
-    var createScene: JsonScene -> SceneBridge;
-    var sceneDefinition: JsonScene;
     var prefabSelect: MenuSelect<Prefab>;
-    var currentSceneFile: String;
-    var sceneEntities: Array<Entity>;
-
-    public function loadScene(scene: SceneBridge) {
-        scene.onAddEntity.call(addEntity);
-        scene.onBegin.call( function(sprite: Sprite) {
-                editorLayer = new Sprite();
-                camera.listen(function(p, o) {
-                        editorLayer.x = -p.x;
-                        editorLayer.y = -p.y;
-                    });
-                sprite.addChild(editorLayer);
-            });
-        paused.set(true);
-        scene.load();
-    }
+    var loaded: LoadedScene;
 
     public function resetMode() {
         this.entityAdd.disable();
@@ -117,8 +100,28 @@ class Editor {
                          , paused
                          , prefabs
                          ) {
-        sceneEntities = [];
-        this.createScene = createScene;
+        loaded = new LoadedScene(createScene, paused
+                                 , function(done) {
+                                     new Save().extensions(['json']).open(done);
+                                 }, function(done) {
+                                     new Open().chooseFiles()
+                                     .open(function(ps) {
+                                             ps.length == 0 ? 
+                                             done(null) : 
+                                             done(ps[0]);
+                                         });
+                                 });
+        loaded.onBegin.call(function(sprite) {
+                this.editorLayer = new Sprite();
+                this.camera.listen(function(p, o) {
+                        editorLayer.x = -p.x;
+                        editorLayer.y = -p.y;
+                    });
+                sprite.addChild(editorLayer);
+            });
+        loaded.onAddEntity.call(function(e) {
+                editorLayer.addChild(e);
+            });
         this.paused = paused;
         this.prefabs = prefabs;
         this.camera = camera;
@@ -153,67 +156,17 @@ class Editor {
             .add(entityAdd)
             .add(select);
         setupMenubar();
-        newScene();
-    }
-
-    private function newScene() {
-        currentSceneFile = null;
-        sceneDefinition = { entities: []};
-        loadScene(createScene(sceneDefinition));
+        loaded.newScene();
     }
 
     private function setupFileMenu() {
-                
-        function saveCurrentFile() {
-            if(currentSceneFile == null) return;
-            var file = File.write(currentSceneFile, false);
-            sceneDefinition.entities = [];
-            for(e in sceneEntities) {
-                if(!e.saved.save || e.saved.deleted) continue;
-                sceneDefinition.entities.push(e.saved);
-            }
-            sceneEntities = sceneEntities.filter(function(e) {
-                    return !e.saved.deleted;
-                });
-            file.writeString(new Json().stringify(sceneDefinition));
-        }
-
-        function saveAs() {
-            new Save().extensions(['json']).open(function(path) {
-                    currentSceneFile = path;
-                    saveCurrentFile();
-                });
-        }
-                
         var m = Menubar.get()
-            .add('File/New', null, true, function() {
-                    newScene();
-                })
-            .add('File/Open', null, true, function(){
-                    new Open().chooseFiles().open(function(paths) {
-                            if(paths.length == 0) return;
-                            var path = paths[0];
-                            var contents = File.getContent(path);
-                            try {
-                                sceneDefinition = new Json().parse(contents);
-                            } catch(e: Dynamic) {
-                                trace('parse error for $path: $e');
-                                return;
-                            }
-                            currentSceneFile = path;
-                            loadScene(createScene(sceneDefinition));
-                        });
-                })
-            .add('File/Save', null, true, function() {
-                    if(currentSceneFile == null) {
-                        saveAs();
-                        return;
-                    }
-                    saveCurrentFile();
-                })
-            .add('File/Save As', null, true, saveAs);
+            .add('File/New', null, true, loaded.newScene)
+            .add('File/Open', null, true, loaded.load)
+            .add('File/Save', null, true, loaded.save)
+            .add('File/Save As', null, true, loaded.saveAs);
     }
-    
+
     private function setupMenubar() {
         setupFileMenu();
 
@@ -260,12 +213,5 @@ class Editor {
                     m.disable('Edit/Add Entity');
                 }
             });
-    }
-
-    public function addEntity(e: EntityBridge): Editor {
-        var entity = new Entity(e);
-        sceneEntities.push(entity);
-        editorLayer.addChild(entity);
-        return this;
     }
 }
