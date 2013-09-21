@@ -160,58 +160,36 @@ class Editor {
     }
 
     private function setupFileMenu() {
-        var m = Menubar.get()
-            .add('File/New', null, true, loaded.newScene)
-            .add('File/Open', null, true, loaded.load)
-            .add('File/Save', null, true, loaded.save)
-            .add('File/Save As', null, true, loaded.saveAs);
+        Commands.get(Lib.current.stage)
+            .command('new scene', 'File/New', "n", loaded.newScene)
+            .command('open scene', 'File/Open', "o", loaded.load)
+            .command('save scene', 'File/Save', 's', loaded.save)
+            .command('save scene as', 'File/Save As', 'S', loaded.saveAs);
     }
 
-    private function setupMenubar() {
-        setupFileMenu();
-
-        var m = Menubar.get();
-
-        prefabSelect = new MenuSelect(m, 'Prefab')
+    private function setupPrefabMenu() {
+        prefabSelect = new MenuSelect(Menubar.get(), 'Prefab')
             .onSelect(function(tag, data) {
                     selectedPrefab = data;
                 });
         prefabs.map(function(p) {
                 prefabSelect.add(p.type, p);
             });
-        m.add('Edit/Pause')
-            .enable('Edit/Pause')
-            .add('Edit/Add Entity')
-            .listen('Edit/Pause', function() {
-                    paused.set(!paused.get());
-                })
-            .listen('Edit/Add Entity', function() {
-                    if(entityAdd.enabled) {
-                        m.off('Edit/Add Entity');                    
-                        select.enable();
-                        return;
-                    }
-                    m.on('Edit/Add Entity');                    
-                    entityAdd.enable();
-                });
+    }
 
-        this.entityAdd
-            .onEnable(function() {
-                    m.on('Edit/Add Entity');
-                })
-            .onDisable(function() {
-                    m.off('Edit/Add Entity');
-                });
+    private function setupEditMenu() {
+        Commands.get(Lib.current.stage)
+            .commandToggle('pause', 'Edit/Pause', 'p'
+                           , paused)
+            .commandMode('add entity', 'Edit/Add Entity', 'a'
+                         , entityAdd, paused)
+            .commandMode('select', 'Edit/Select', 'e'
+                           , select, paused);
+    }
 
-        this.paused.listen(function(v, o) {
-                if(v) {
-                    m.on('Edit/Pause');
-                    m.enable('Edit/Add Entity');
-                } else {
-                    m.off('Edit/Pause');
-                    m.off('Edit/Add Entity');
-                    m.disable('Edit/Add Entity');
-                }
-            });
+    private function setupMenubar() {
+        setupPrefabMenu();
+        setupFileMenu();
+        setupEditMenu();
     }
 }
