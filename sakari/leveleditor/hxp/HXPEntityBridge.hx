@@ -17,7 +17,7 @@ class HXPEntityBridge implements EntityBridge{
         this.y = new Observable(e.y + e.originY);
         this.deleted = new Observable(false);
 
-        this.e.onChange(function(t) {
+        this.e.onChange.call(function(t) {
                 this.x.set(e.x + e.originX);
                 this.y.set(e.y + e.originY);
             });

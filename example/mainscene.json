@@ -1,4 +1,11 @@
 {
+    "layers": [
+        { "name": "default" }, 
+        { "name": "tiled", "grid": "tiled" }
+    ],
+    "grids": [
+        { "name": "tiled", "x": {"x": 10, "y": 0}, "y": { "x": 0, "y": 10}}
+    ],
     "entities": [
         {
             "save": true,

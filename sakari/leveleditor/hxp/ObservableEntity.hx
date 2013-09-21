@@ -1,28 +1,27 @@
 package sakari.leveleditor.hxp;
 import com.haxepunk.Entity;
+import com.haxepunk.HXP;
 import sakari.leveleditor.Editor;
+import sakari.leveleditor.EventEmitter;
 
 class ObservableEntity extends Entity {
     var listeners: Array<ObservableEntity -> Void>;
     public var def: EntityArguments;
+    public var onChange: EventEmitter<ObservableEntity>;
 
-    public function notifyChange() {
-        for(i in listeners) {
-            i(this);
-        }
-    }
+    public function gameUpdate() {}
 
-    public function onChange(observer: ObservableEntity -> Void): ObservableEntity {
-        listeners.push(observer);
-        return this;
+    public override function update() {
+        super.update();
+        if(HXP.engine.paused) return;
+        gameUpdate();
+        onChange.emit(this);
     }
 
     public function new(def: EntityArguments) {
         super();
-        x = def.x;
-        y = def.y;
+        onChange = new EventEmitter();
         this.def = def;
-        listeners = [];
     }
 
 }

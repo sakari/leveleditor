@@ -7,7 +7,7 @@ class EditorTest extends EditorEngine {
     public override function entities(): Array<Prefab> {
         return [
                 {type: 'some', icon: null }
-                , {type: 'other', icon: null }
+                , {type: 'other', icon: null, layer: 'tiled' }
                 ];
     }
 

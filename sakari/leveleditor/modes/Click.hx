@@ -13,15 +13,15 @@ class Click extends Mode {
         super();
         this.on = on;
         this.fn = fn;
+        onEnable(function() {
+                on.addEventListener(MouseEvent.MOUSE_DOWN, click);
+            });
+        onDisable(function() {
+                on.removeEventListener(MouseEvent.MOUSE_DOWN, click);
+                on.removeEventListener(MouseEvent.MOUSE_MOVE, notClick);
+                on.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+            });
     }
-
-    public override function enable(): Click {
-        if(enabled) return this;
-        on.addEventListener(MouseEvent.MOUSE_DOWN, click);
-        super.enable();
-        return this;
-    }
-    
     private function notClick(m: MouseEvent) {
         isClick = false;
     }
@@ -35,17 +35,9 @@ class Click extends Mode {
     private function mouseUp(m: MouseEvent) {
         if(isClick)
             fn(m.stageX, m.stageY);
+        isClick = false;
         on.removeEventListener(MouseEvent.MOUSE_MOVE, notClick);
         on.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
-    }
-
-    public override function disable(): Click {
-        if(!enabled) return this;
-        on.removeEventListener(MouseEvent.MOUSE_DOWN, click);
-        on.removeEventListener(MouseEvent.MOUSE_MOVE, notClick);
-        on.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
-        super.disable();
-        return this;
     }
 }
 

@@ -55,12 +55,26 @@ interface EntityBridge {
 
 typedef Prefab = {
     var type: String;
-    var icon: BitmapData;
+    @:optional var icon: BitmapData;
+    @:optional var layer: String;
+};
+
+typedef JsonLayer = {
+    var name: String;
+    @:optional var grid: String;
+};
+
+typedef JsonGrid = {
+    var name: String;
+    var x: {x: Float, y: Float};
+    var y: {x: Float, y: Float};
 };
 
 typedef JsonScene = {
     var entities: Array<EntityArguments>;
-};
+    var layers: Array<JsonLayer>;
+    var grids: Array<JsonGrid>;
+}
 
 typedef EntityArguments = {
     var x: Float;
@@ -69,6 +83,7 @@ typedef EntityArguments = {
     var id: Int;
     var save: Bool;
     var deleted: Bool;
+    var layer: String;
 }
 
 class Editor {
@@ -83,14 +98,14 @@ class Editor {
     var entityAdd: Mode;
     var select: Mode;
     var originalCamera: Point;
-    var prefabSelect: MenuSelect<Prefab>;
+    var prefabMenu: MenuSelect<Prefab>;
     var loaded: LoadedScene;
 
     public function resetMode() {
         this.entityAdd.disable();
         this.select.disable();
         this.paused.set(false);
-        this.prefabSelect.reset();
+        this.prefabMenu.reset();
     }
 
     public function new( createEntity: EntityArguments -> Void
@@ -137,25 +152,19 @@ class Editor {
                     majorMode.disable();
                 }
             });
+        prefabMenu = setupPrefabMenu();
         entityAdd = new AddEntity(Lib.current.stage
                                   , camera
-                                  , function(x: Float, y: Float) {
-                                      if(selectedPrefab == null) return;
-                                      var e = {
-                                          type: selectedPrefab.type
-                                          , x: x + camera.get().x
-                                          , y: y + camera.get().y
-                                          , id: 0
-                                          , save: true
-                                          , deleted: false
-                                      };
-                                      createEntity(e);
-                                  });
-        select = new Select(Lib.current.stage, camera, screen);
+                                  , prefabMenu.observe
+                                  , function(s) { return loaded.tiler(s); }
+                                  , createEntity);
+        select = new Select(Lib.current.stage, camera, screen, 
+                            function(s) { return loaded.tiler(s); });
         majorMode = new Single()
             .add(entityAdd)
             .add(select);
-        setupMenubar();
+        setupFileMenu();
+        setupEditMenu();
         loaded.newScene();
     }
 
@@ -167,29 +176,21 @@ class Editor {
             .command('save scene as', 'File/Save As', 'S', loaded.saveAs);
     }
 
-    private function setupPrefabMenu() {
-        prefabSelect = new MenuSelect(Menubar.get(), 'Prefab')
-            .onSelect(function(tag, data) {
-                    selectedPrefab = data;
-                });
+    private function setupPrefabMenu(): MenuSelect<Prefab> {
+        var m = new MenuSelect(Menubar.get(), 'Prefab');
         prefabs.map(function(p) {
-                prefabSelect.add(p.type, p);
+                m.add(p.type, p);
             });
+        return m;
     }
 
     private function setupEditMenu() {
         Commands.get(Lib.current.stage)
             .commandToggle('pause', 'Edit/Pause', 'p'
                            , paused)
-            .commandMode('add entity', 'Edit/Add Entity', 'a'
+            .commandToggle('add entity', 'Edit/Add Entity', 'a'
                          , entityAdd, paused)
-            .commandMode('select', 'Edit/Select', 'e'
+            .commandToggle('select', 'Edit/Select', 'e'
                            , select, paused);
-    }
-
-    private function setupMenubar() {
-        setupPrefabMenu();
-        setupFileMenu();
-        setupEditMenu();
     }
 }

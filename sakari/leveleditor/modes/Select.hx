@@ -7,6 +7,7 @@ import flash.events.KeyboardEvent;
 import flash.geom.Point;
 import sakari.leveleditor.Entity;
 import sakari.leveleditor.Editor;
+import sakari.leveleditor.Tiler;
 using Lambda;
 
 class Select extends Mode {
@@ -18,11 +19,14 @@ class Select extends Mode {
     var dragScroll: Drag;
     var autoScroll: AutoScroll;
     var scrollMode: Single; 
+    var _grids: String -> Tiler;
 
     public function new(on: DisplayObjectContainer
                         , camera: Observable<Point>
-                        , screen: Observable<Point>) {
+                        , screen: Observable<Point>
+                        , grids: String -> Tiler) {
         super();
+        _grids = grids;
         this.camera = camera;
         selected = [];
         this.on = on;
@@ -31,17 +35,23 @@ class Select extends Mode {
                 var c = camera.get();
                 camera.set(new Point(c.x - x, c.y - y));
             });
+
         scrollMode = new Single()
             .add(autoScroll)
             .add(dragScroll);
-    }
+        scrollMode.follows(this);
 
-    public override function enable() {
-        on.addEventListener(MouseEvent.MOUSE_DOWN, selectEntity);
-        on.addEventListener(KeyboardEvent.KEY_DOWN, deleteSelection);
-        dragScroll.enable();
-        super.enable();
-        return this;
+        onEnable(function() {
+                on.addEventListener(MouseEvent.MOUSE_DOWN, selectEntity);
+                on.addEventListener(KeyboardEvent.KEY_DOWN, deleteSelection);
+                dragScroll.enable();
+            });
+        onDisable(function() {
+                on.removeEventListener(KeyboardEvent.KEY_DOWN, deleteSelection);
+                on.removeEventListener(MouseEvent.MOUSE_DOWN, selectEntity);
+                on.removeEventListener(Event.ENTER_FRAME, moveSelected);
+                on.removeEventListener(MouseEvent.MOUSE_UP, moveStop);
+            });
     }
 
     private function selectEntity(m: MouseEvent) {
@@ -72,8 +82,14 @@ class Select extends Mode {
         var x = on.mouseX + c.x;
         var y = on.mouseY + c.y;
         selected.map(function(e) {
-                e.bridge.x.set(e.bridge.x.get() + x - dragStart.x);
-                e.bridge.y.set(e.bridge.y.get() + y - dragStart.y);
+                var real_x = e.snapDelta.x + e.x + x - dragStart.x;
+                var real_y = e.snapDelta.y + e.y + y - dragStart.y;
+                var t: Tiler = _grids(e.bridge.definition.layer);
+                var p = t.snap(new Point(real_x, real_y));
+                e.snapDelta.x = real_x - p.x;
+                e.snapDelta.y = real_y - p.y;
+                e.bridge.x.set(p.x);
+                e.bridge.y.set(p.y);
                 e.save();
             });
         dragStart.x = x;
@@ -93,15 +109,5 @@ class Select extends Mode {
         dragScroll.enable();
         on.removeEventListener(Event.ENTER_FRAME, moveSelected);
         on.removeEventListener(MouseEvent.MOUSE_UP, moveStop);
-    }
-
-    public override function disable() {
-        on.removeEventListener(KeyboardEvent.KEY_DOWN, deleteSelection);
-        on.removeEventListener(MouseEvent.MOUSE_DOWN, selectEntity);
-        on.removeEventListener(Event.ENTER_FRAME, moveSelected);
-        on.removeEventListener(MouseEvent.MOUSE_UP, moveStop);
-        scrollMode.disable();
-        super.disable();
-        return this;
     }
 }

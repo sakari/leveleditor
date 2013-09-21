@@ -56,31 +56,6 @@ class Commands {
         return _commands;
     }
 
-    public function commandMode(name: String
-                                , menu: String
-                                , shortcut: String
-                                , mode: Mode
-                                , ?enabled: Observable<Bool>): Commands {
-        var toggle = new Observable(false)
-            .listen(function(v, o) {
-                    if(v == o) return;
-                    if(v) {
-                        mode.enable();
-                    } else
-                        mode.disable();
-                });
-        mode
-            .onEnable(function() {
-                    toggle.set(true);
-                })
-            .onDisable(function() {
-                    toggle.set(false);
-                });
-        commandToggle(name, menu, shortcut, toggle, enabled);
-        toggle.set(mode.enabled);
-        return this;
-    }
-    
     public function commandToggle(name: String
                                   , menu: String
                                   , shortcut: String

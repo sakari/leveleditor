@@ -11,13 +11,13 @@ class SomeEntity extends ObservableEntity {
         speed = new Point(5 - Math.random() * 10, 0);
         var i = new Image('graphics/test.png');
         addGraphic(i);
+        x = def.x - i.width / 2;
+        y = def.y - i.height / 2;
         setOrigin(Std.int(i.width / 2), Std.int(i.height / 2));
     }
 
-    public override function update() {
-        super.update();
+    public override function gameUpdate() {
         x += HXP.elapsed * speed.x;
         y += HXP.elapsed * speed.y;
-        notifyChange();
     }
 }

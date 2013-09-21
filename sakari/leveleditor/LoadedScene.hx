@@ -1,6 +1,9 @@
 package sakari.leveleditor;
 import sakari.leveleditor.Editor;
 import flash.display.Sprite;
+import flash.geom.Point;
+import sakari.leveleditor.Tiler;
+
 #if mocks
 import mocks.sys.io.File;
 #else
@@ -17,6 +20,8 @@ class LoadedScene {
     var getOpenPath: (String -> Void) -> Void;
     public var onAddEntity: EventEmitter<Entity>;
     public var onBegin: EventEmitter<Sprite>;
+    var loadedJson: JsonScene;
+    var tilers: Map<String, Tiler>;
 
     public function new(createScene: JsonScene -> SceneBridge
                         , paused: Observable<Bool>
@@ -29,6 +34,27 @@ class LoadedScene {
         onAddEntity = new EventEmitter();
         onBegin = new EventEmitter();
     }
+
+    private function loadLayerTilers(scene: JsonScene) {
+        tilers = new Map();
+        for(layer in scene.layers) {
+            if(layer.grid == null) {
+                tilers.set(layer.name, new FreeHand());
+                continue;
+            }
+            for(grid in scene.grids) {
+                if(layer.grid != grid.name) continue;
+                tilers.set(layer.name, new Tiled(
+                                                 new Point(grid.x.x, grid.x.y)
+                                                 , new Point(grid.y.x, grid.y.y)
+                                                 ));
+                break;
+            }
+        }
+        if(tilers.get('default') == null) {
+            tilers.set('default', new FreeHand());
+        }
+    }
     
     private function addEntity(e: EntityBridge) {
         var entity = new Entity(e);
@@ -37,6 +63,8 @@ class LoadedScene {
     }
 
     private function setScene(sceneDefinition) {
+        loadedJson = sceneDefinition;
+        loadLayerTilers(sceneDefinition);
         loadedScene = createScene(sceneDefinition);
         sceneEntities = [];
         loadedScene.onAddEntity.call(addEntity);
@@ -47,7 +75,7 @@ class LoadedScene {
 
     public function newScene() {
         currentSceneFile = null;
-        setScene({entities: []});
+        setScene({layers: [], grids: [], entities: []});
     }
 
     public function saveAs() {
@@ -58,7 +86,9 @@ class LoadedScene {
         if(path == null) return;
         currentSceneFile = path;
         var file = File.write(currentSceneFile, false);
-        var sceneDefinition = { entities: []};
+        var sceneDefinition = { layers: loadedJson.layers
+                                , grids: loadedJson.grids
+                                , entities: []};
         for(e in sceneEntities) {
             if(!e.saved.save || e.saved.deleted) continue;
             sceneDefinition.entities.push(e.saved);
@@ -75,6 +105,10 @@ class LoadedScene {
             return;
         }
         saveWithPath(currentSceneFile);
+    }
+
+    public function tiler(layer: String) {
+        return tilers.get(layer == null ? 'default' : layer);
     }
 
     public function load() {

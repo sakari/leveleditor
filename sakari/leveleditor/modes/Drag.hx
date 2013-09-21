@@ -16,9 +16,16 @@ class Drag extends Mode {
         this.fn = fn;
         startX = 0;
         startY = 0;
+        onEnable(function() {
+                on.addEventListener(MouseEvent.MOUSE_DOWN, dragStart);
+            });
+        onDisable(function() {
+                on.removeEventListener(MouseEvent.MOUSE_DOWN, dragStart);
+                on.removeEventListener(MouseEvent.MOUSE_MOVE, dragMove);
+                on.removeEventListener(MouseEvent.MOUSE_UP, dragStop);
+            });
     }
 
-    
     private function dragStart(m: MouseEvent) {
         startX = m.stageX;
         startY = m.stageY;
@@ -36,23 +43,7 @@ class Drag extends Mode {
     private function dragStop(m: MouseEvent) {
         fn(m.stageX - startX
            ,  m.stageY - startY);
-        disable();
-        enable();
-    }
-
-    public override function enable(): Drag {
-        if(enabled) return this;
-        on.addEventListener(MouseEvent.MOUSE_DOWN, dragStart);
-        super.enable();
-        return this;
-    }
-
-    public override function disable(): Drag {
-        if(!enabled) return this;
-        on.removeEventListener(MouseEvent.MOUSE_DOWN, dragStart);
         on.removeEventListener(MouseEvent.MOUSE_MOVE, dragMove);
         on.removeEventListener(MouseEvent.MOUSE_UP, dragStop);
-        super.disable();
-        return this;
     }
 }

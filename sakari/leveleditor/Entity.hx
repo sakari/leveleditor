@@ -1,4 +1,5 @@
 package sakari.leveleditor;
+import flash.geom.Point;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import sakari.leveleditor.Editor;
@@ -8,6 +9,7 @@ class Entity extends Sprite {
     public var selected(get, set): Bool;
     var _selected: Bool;
     var _saved: EntityArguments;
+    public var snapDelta: Point;
     public var saved(get, null): EntityArguments;
 
     public function get_saved() {
@@ -25,6 +27,8 @@ class Entity extends Sprite {
     }
 
     public function set_selected(v: Bool): Bool {
+        snapDelta.x = 0;
+        snapDelta.y = 0;
         _selected = v;
         draw();
         return _selected;
@@ -41,11 +45,11 @@ class Entity extends Sprite {
         graphics.clear();
         graphics.beginFill(0, 0);
         if(selected) graphics.lineStyle(1, 0x00ff00);
-        else graphics.lineStyle(1, 0x0000ff);
         graphics.drawCircle(0, 0, 10);
     }
 
     public function new(e: EntityBridge) {
+        snapDelta = new Point(0, 0);
         _saved = e.definition;
         super();
         selected = false;

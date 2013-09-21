@@ -4,6 +4,7 @@ import sakari.leveleditor.Editor;
 import sakari.leveleditor.LoadedScene;
 import mocks.sys.io.Fs;
 import flash.display.Sprite;
+import flash.geom.Point;
 using sakari.should.Should;
 
 class TestSceneBridge implements Editor.SceneBridge {
@@ -32,6 +33,7 @@ class LoadedSceneTest {
     var savePath: String;
     var openPath: String;
     var scene: JsonScene;
+    var emptyScene: JsonScene;
 
     @Before function setup() {
         Fs.clean();
@@ -39,6 +41,7 @@ class LoadedSceneTest {
         openPath = PATH;
         paused = new Observable(true);
         bridge = null;
+        emptyScene = { layers: [], grids: [], entities: []};
         loadedScene = new LoadedScene(function(json) {
                 bridge = new TestSceneBridge(json);
                 return bridge;
@@ -48,9 +51,17 @@ class LoadedSceneTest {
             }, function(cb: String -> Void): Void {
                 cb(openPath);
             });
-        scene = { entities: [{x: 1, y: 1
-                              , save: true, deleted: false
-                              , id: 0, type: 'some'}] };
+        scene = { layers: [ { name: 'layer' }, 
+            { name: 'tiledLayer', grid: 'tiled'}]
+                  , grids: [{ name: 'tiled', 
+                              x: {x: 10, y: 0}, 
+                              y: { x: 0, y: 10}}]
+                  , entities: [{x: 1, y: 1
+                                , save: true
+                                , deleted: false
+                                , id: 0
+                                , type: 'some'
+                                , layer: 'layer' }] };
         Fs.write(PATH, new Json().stringify(scene));
     }
 
@@ -58,7 +69,8 @@ class LoadedSceneTest {
         loadedScene.newScene();
         savePath = "saved";
         loadedScene.save();
-        Fs.read("saved").should().eql(new Json().stringify({entities: []}));
+        Fs.read("saved").should().eql(new Json()
+                                      .stringify(emptyScene));
     }
 
     @Test function new_scene_empties_the_current_file_setting() {
@@ -66,7 +78,7 @@ class LoadedSceneTest {
         loadedScene.newScene();
         savePath = 'newpath';
         loadedScene.save();
-        Fs.read('newpath').should().eql(new Json().stringify({entities: []}));
+        Fs.read('newpath').should().eql(new Json().stringify(emptyScene));
     }
 
     @Test function new_scene_saving_can_be_cancelled() {
@@ -105,7 +117,7 @@ class LoadedSceneTest {
     @Test function dynamic_entities_are_not_saved() {
         loadedScene.load();
         bridge.onAddEntity.emit(new TestEntityBridge({
-                x: 1, y: 1, type: 'a', save: false, deleted: false, id: 1
+                layer: 'layer', x: 1, y: 1, type: 'a', save: false, deleted: false, id: 1
                         }));
         loadedScene.save();
         Fs.read(PATH).should().eql(new Json()
@@ -114,7 +126,7 @@ class LoadedSceneTest {
 
     @Test function entities_added_from_the_editor_are_saved() {
         loadedScene.load();
-        var e = {x: 1.0, y: 1.0, type: 'a', save: true, deleted: false, id: 1 };
+        var e = {layer: 'layer', x: 1.0, y: 1.0, type: 'a', save: true, deleted: false, id: 1 };
         bridge.onAddEntity.emit(new TestEntityBridge(e));
         loadedScene.save();
         scene.entities.push(e);
@@ -124,7 +136,7 @@ class LoadedSceneTest {
 
     @Test function deleted_entities_are_not_saved() {
         loadedScene.load();
-        var e = {x: 1.0, y: 1.0, type: 'a', save: true, deleted: true, id: 1 };
+        var e = {layer: 'layer', x: 1.0, y: 1.0, type: 'a', save: true, deleted: true, id: 1 };
         bridge.onAddEntity.emit(new TestEntityBridge(e));
         loadedScene.save();
         Fs.read(PATH).should().eql(new Json()
@@ -148,5 +160,23 @@ class LoadedSceneTest {
             });
         loadedScene.load();
         c.should().eql(1);
+    }
+
+    @Test function null_layer_returns_default_tiler() {
+        loadedScene.load();
+        loadedScene.tiler(null).tile(new Point(12.1, 0)).x
+            .should().eql(12.1);
+    }
+
+    @Test function layers_without_tilers_return_freehand_tiler() {
+        loadedScene.load();
+        loadedScene.tiler('layer').tile(new Point(12.1, 0)).x
+            .should().eql(12.1);
+    }
+
+    @Test function layers_with_tilers_return_tiled_tilers() {
+        loadedScene.load();
+        loadedScene.tiler('tiledLayer').tile(new Point(10, 10)).x
+            .should().eql(1);
     }
 }

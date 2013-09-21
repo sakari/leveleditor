@@ -16,6 +16,7 @@ class EntityTest {
                                    , id: 0
                                    , save: true
                                    , deleted: false
+                                   , layer: 'default'
             });
         e = new Entity(b);
     }

@@ -1,45 +1,43 @@
 package sakari.leveleditor;
 
-class Mode {
+class Mode extends ObservableBool<Bool>{
     var enableListeners: Array<Void -> Void>;
     var disableListeners: Array<Void -> Void>;
-    var _enabled: Bool;
     public var enabled(get, null): Bool;
 
     public function new() {
-        enableListeners = [];
-        disableListeners = [];
-        _enabled = false;
+        super(false);
     }
+
     public function enable(): Mode {
-        if(enabled) return this;
-        _enabled = true;
-        for(i in enableListeners) {
-            i();
-        }
+        if(get()) return this;
+        set(true);
         return this;
     }
 
     public function get_enabled() {
-        return _enabled;
+        return get();
     }
 
     public function disable(): Mode {
-        if(!enabled) return this;
-        _enabled = false;
-        for(i in disableListeners) {
-            i();
-        }
+        if(!get()) return this;
+        set(false);
         return this;
     }
 
     public function onEnable(cb: Void -> Void): Mode {
-        enableListeners.push(cb);
+        listen(function(v, o) {
+                if(!v) return;
+                cb();
+            });
         return this;
     }
 
     public function onDisable(cb: Void -> Void): Mode {
-        disableListeners.push(cb);
+        listen(function(v, o) {
+                if(v) return;
+                cb();
+            });
         return this;
     }
 }

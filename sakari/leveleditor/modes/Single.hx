@@ -8,16 +8,18 @@ class Single extends Mode{
     public function new() {
         super();
         modes = [];
+        onEnable(function() {
+                if(enabledMode != null) {
+                    modes[enabledMode].enable();
+                }
+            });
+        onDisable(function() {
+                for(i in modes) {
+                    i.disable();
+                }
+            });
     }
 
-    public override function enable(): Single {
-        if(enabledMode != null) {
-            modes[enabledMode].enable();
-        }
-        super.enable();
-        return this;
-    }
-    
     public function add(m: Mode): Single {
         var modeIndex = modes.length;
         if(m.enabled) {
@@ -36,14 +38,6 @@ class Single extends Mode{
                 enabledMode = null;
             });
         modes.push(m);
-        return this;
-    }
-
-    public override function disable(): Single {
-        for(i in modes) {
-            i.disable();
-        }
-        super.disable();
         return this;
     }
 } 

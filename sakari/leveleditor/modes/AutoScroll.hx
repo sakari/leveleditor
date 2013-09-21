@@ -26,20 +26,13 @@ class AutoScroll extends Mode {
         this.camera = camera;
         this.screen = screen;
         cameraScrollVector = new Point(0, 0);
-    }
-        
-    public override function enable(): AutoScroll {
-        if(enabled) return this;
-        on.addEventListener(Event.ENTER_FRAME, scroll);
-        super.enable();
-        return this;
-    }
 
-    public override function disable(): AutoScroll {
-        if(!enabled) return this;
-        on.removeEventListener(Event.ENTER_FRAME, scroll);
-        super.disable();
-        return this;
+        onEnable(function() {
+                on.addEventListener(Event.ENTER_FRAME, scroll);        
+            });
+        onDisable(function() {
+                on.removeEventListener(Event.ENTER_FRAME, scroll);
+            });
     }
 
     private function scroll(m: Event) {
