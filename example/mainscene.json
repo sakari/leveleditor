@@ -4,26 +4,8 @@
         { "name": "tiled", "grid": "tiled" }
     ],
     "grids": [
-        { "name": "tiled", "x": {"x": 10, "y": 0}, "y": { "x": 0, "y": 10}}
+        { "name": "tiled", "x": {"x": 50, "y": 0}, "y": { "x": 0, "y": 50}}
     ],
     "entities": [
-        {
-            "save": true,
-            "type": "some",
-            "x": 10,
-            "y": 10
-        },
-        {
-            "save": true,
-            "type": "some",
-            "x": 20,
-            "y": 20
-        },
-        {
-            "save": true,
-            "type": "other",
-            "x": 20,
-            "y": 30
-        }
     ]
 }

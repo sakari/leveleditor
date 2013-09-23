@@ -6,17 +6,20 @@ import sakari.leveleditor.hxp.ObservableEntity;
 class EditorTest extends EditorEngine {
     public override function entities(): Array<Prefab> {
         return [
-                {type: 'some', icon: null }
-                , {type: 'other', icon: null, layer: 'tiled' }
+                {type: 'dude', icon: null }
+                , {type: 'platform', icon: null, layer: 'tiled' }
+                , {type: 'spawner', icon: null, layer: 'tiled' }
                 ];
     }
 
     public override function entityFactory(p) {
-        var e: ObservableEntity;
-        if(p.type == 'some')
-            e = new SomeEntity(p);
-        else
-            e = new OtherEntity(p);
+        var e: ObservableEntity = null;
+        if(p.type == 'dude')
+            e = new Dude(p);
+        else if(p.type == 'platform')
+            e = new Platform(p);
+        else if(p.type == 'spawner')
+            e = new Spawner(p);
         return e;
     }
 
