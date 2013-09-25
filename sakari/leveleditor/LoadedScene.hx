@@ -108,7 +108,11 @@ class LoadedScene {
     }
 
     public function tiler(layer: String) {
-        return tilers.get(layer == null ? 'default' : layer);
+        var tiler = tilers.get(layer == null ? 'default' : layer);
+        if(tiler == null) {
+            throw 'no such grid ${layer}';
+        }
+        return tiler;
     }
 
     public function load() {

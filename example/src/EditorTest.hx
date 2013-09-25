@@ -6,7 +6,7 @@ import sakari.leveleditor.hxp.ObservableEntity;
 class EditorTest extends EditorEngine {
     public override function entities(): Array<Prefab> {
         return [
-                {type: 'dude', icon: null, layer: 'defaults' }
+                {type: 'dude', icon: null, layer: 'default' }
                 , {type: 'platform', icon: null, layer: 'tiled' }
                 , {type: 'spawner', icon: null, layer: 'tiled' }
                 ];
