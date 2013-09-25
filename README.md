@@ -24,8 +24,8 @@ Clone, build and install from github. Note the tags.
 
  * [filepicker 1.0.0](https://github.com/sakari/filepicker), requires building native libs
  * [menubar 0.0.2](https://github.com/sakari/menubar), requires building native libs
- * [should 0.0.1](https://github.com/sakari/haxe-should)
- * [should-openfl 0.0.2](https://github.com/sakari/haxe-should-openfl)
+ * [should 0.0.2](https://github.com/sakari/haxe-should)
+ * [should-openfl 0.0.3](https://github.com/sakari/haxe-should-openfl)
 
 The `project.xml` and `example/project.xml` define the other dependencies which you
 need to get from haxelib. After you are done build everything with
