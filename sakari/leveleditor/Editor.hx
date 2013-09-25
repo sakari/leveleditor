@@ -145,11 +145,14 @@ class Editor {
                 if(v == old) return;
                 if(v) {
                     originalCamera = camera.get();
+                    majorMode.enable();
                     select.enable();
+                    Commands.instance(Lib.current.stage).enable();
                 }else {
                     camera.set(originalCamera);
                     originalCamera = null;
                     majorMode.disable();
+                    Commands.instance(Lib.current.stage).disable();
                 }
             });
         prefabMenu = setupPrefabMenu();
@@ -163,13 +166,14 @@ class Editor {
         majorMode = new Single()
             .add(entityAdd)
             .add(select);
+        
         setupFileMenu();
         setupEditMenu();
         loaded.newScene();
     }
 
     private function setupFileMenu() {
-        Commands.get(Lib.current.stage)
+        Commands.instance(Lib.current.stage)
             .command('new scene', 'File/New', "n", loaded.newScene)
             .command('open scene', 'File/Open', "o", loaded.load)
             .command('save scene', 'File/Save', 's', loaded.save)
@@ -185,7 +189,7 @@ class Editor {
     }
 
     private function setupEditMenu() {
-        Commands.get(Lib.current.stage)
+        Commands.instance(Lib.current.stage)
             .commandToggle('pause', 'Edit/Pause', 'p'
                            , paused)
             .commandToggle('add entity', 'Edit/Add Entity', 'a'

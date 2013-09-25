@@ -51,6 +51,8 @@ class Select extends Mode {
                 on.removeEventListener(MouseEvent.MOUSE_DOWN, selectEntity);
                 on.removeEventListener(Event.ENTER_FRAME, moveSelected);
                 on.removeEventListener(MouseEvent.MOUSE_UP, moveStop);
+                selected.map(function(e) { e.selected = false;  });
+                selected = [];
             });
     }
 
