@@ -22,6 +22,8 @@ class EditorEngine extends Engine {
     }
 
     private function onResize(e: Event) {
+        HXP.screen.scaleX = HXP.screen.scaleY = 1;
+        HXP.resize(HXP.stage.stageWidth, HXP.stage.stageHeight);
         screen.set(new Point(HXP.stage.stageWidth,
                              HXP.stage.stageHeight));
     }

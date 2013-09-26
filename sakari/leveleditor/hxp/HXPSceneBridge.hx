@@ -37,10 +37,4 @@ class HXPSceneBridge extends Scene implements SceneBridge {
         HXP.engine.update();
         HXP.engine.render();
     }
-
-    public override function update() {
-        HXP.screen.scaleX = HXP.screen.scaleY = 1;
-        HXP.resize(HXP.stage.stageWidth, HXP.stage.stageHeight);
-        super.update();
-    }
 }
