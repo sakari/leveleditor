@@ -4,6 +4,8 @@ A library for adding level editing to openfl based game engines. Why? This way
 what you see in the editor is exactly what the engine will render. We can also
 run and pause the game engine while we are editing the scene to test things out.
 
+Demo video at http://www.youtube.com/watch?v=8noeHe2Z6II&feature=youtu.be
+
 ## Features
 
  * Haxepunk [bridge](https://github.com/sakari/openfl-editor/tree/master/sakari/leveleditor/hxp)
