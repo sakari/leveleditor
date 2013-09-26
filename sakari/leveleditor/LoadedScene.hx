@@ -97,6 +97,7 @@ class LoadedScene {
                 return !e.saved.deleted;
             });
         file.writeString(new Json().stringify(sceneDefinition));
+        file.close();
     }
 
     public function save() {
